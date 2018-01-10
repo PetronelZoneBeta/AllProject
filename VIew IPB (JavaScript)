@@ -1,0 +1,28 @@
+$(function () {
+            $('div.main-head.clearfix:first p.h2').prepend('<div class="topicViewIcons"><a id="topicViewRegular" title="Regular View" class="active"><img src="http://i57.servimg.com/u/f57/17/68/86/50/spacer10.gif" alt=""></a><a id="topicViewBasic" title="Basic View"><img src="http://i57.servimg.com/u/f57/17/68/86/50/spacer11.gif" alt=""></a></div>');
+            function topicViewBasic() {
+                $(".pun .post .user").hide("user");
+                $(".postmain").css('margin-left', '0px');
+                $("#topicViewRegular").removeClass("active");
+                $("#topicViewBasic").addClass('active');
+                $("div.main-content.topic").addClass("basicTopicView");
+            }
+            function topicViewRegular() {
+                $(".pun .post .user").show("user");
+                $(".postmain").css('margin-left', '200px');
+                $("#topicViewBasic").removeClass("active");
+                $("#topicViewRegular").addClass('active');
+                $("div.main-content.topic").removeClass("basicTopicView");
+            }
+            var cookie = my_getcookie('topicViewBasic');
+            if (cookie == 1) topicViewBasic();
+            $('#topicViewBasic').click(function () {
+                my_setcookie('topicViewBasic', 1);
+                topicViewBasic();
+            });
+            $('#topicViewRegular').click(function () {
+                my_setcookie('topicViewBasic', 0);
+                topicViewRegular();
+            });
+ 
+        });
