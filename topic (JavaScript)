@@ -1,0 +1,237 @@
+(function($, j, d, s) {
+	function getStaffMemberOnline()
+	{
+		var rows = "", temp = new Array(), staff = new Array();
+		$.get('/viewonline', function(d) {
+			staff[0] = $('.staff-list div:eq(0)');
+			staff[1] = $('.staff-list div:eq(1)');
+			staff[2] = $('.staff-list div:eq(2)');
+			staff[3] = $('.staff-list div:eq(3)');
+			staff[4] = $('.staff-list div:eq(4)');
+			
+			temp[0] = $('.forumbg table.table1 tbody tr:contains("'+ staff[0].text() +'")', d).length;
+			temp[1] = $('.forumbg table.table1 tbody tr:contains("'+ staff[1].text() +'")', d).length;
+			temp[2] = $('.forumbg table.table1 tbody tr:contains("'+ staff[2].text() +'")', d).length;
+			temp[3] = $('.forumbg table.table1 tbody tr:contains("'+ staff[3].text() +'")', d).length;
+			temp[4] = $('.forumbg table.table1 tbody tr:contains("'+ staff[4].text() +'")', d).length;
+
+			if(temp[0] == 0) $('.staff-list div:eq(0)').attr('style','display: block'), $('.no-staff').hide(); else $('.no-staff').show();
+			if(temp[1] == 0) $('.staff-list div:eq(1)').attr('style','display: block'), $('.no-staff').hide(); else $('.no-staff').show();
+			if(temp[2] == 0) $('.staff-list div:eq(2)').attr('style','display: block'), $('.no-staff').hide(); else $('.no-staff').show();
+			if(temp[3] == 0) $('.staff-list div:eq(3)').attr('style','display: block'), $('.no-staff').hide(); else $('.no-staff').show();
+			if(temp[4] == 0) $('.staff-list div:eq(4)').attr('style','display: block'), $('.no-staff').hide(); else $('.no-staff').show();
+		});
+		return !0;
+	};
+	setTimeout(function() { getStaffMemberOnline()}, 100);
+
+	if(typeof Number.prototype.formatNumberA === 'undefined') {
+ 		Number.prototype.formatNumberA = function (precision) {
+ 			if (!isFinite(this)) {
+ 				return this.toString();
+ 			}
+ 			var a = this.toFixed(precision).split('.');
+ 			a[0] = a[0].split('').reverse().join('').replace(/\d{3}(?=\d)/g, '$&,').split('').reverse().join('');
+ 			return a.join('.');
+ 		};
+ 	};
+
+	function getActivePage(url, link) {
+		if(url.test(window.location.pathname))
+		{
+			$('navbar#primarynav li a.active').removeClass();
+			$('navbar#primarynav li a[href="'+ link+'"]').addClass('active');
+		}
+	};
+
+	j(function()
+	{
+
+		getActivePage(/\/memberlist/, "/memberlist");
+		getActivePage(/\/profile/, "/memberlist");
+
+		j('span#head:eq(1) strong').each(function() {
+			var nr = $(this).text();
+			$(this).html(parseInt(nr).formatNumberA(0));
+		});
+
+		if(typeof(_userdata) != "undefined") $('b:contains("USER")').replaceWith(_userdata.username);
+		
+		var sd = $('.module.recent_topic').html();
+		$('div#footer_block_1 .slide_contect').html(sd);
+
+		var $array = new Array();
+		j('p.replace_mybb').each(function() {
+			var a = $(this).text();
+			$array['total_users'] = parseInt(a.match(/\d+/g)[0])+10;
+			$array['logged_users'] = a.match(/\d+/g)[1];
+			$array['invisible_users'] = a.match(/\d+/g)[2];
+			$array['guest_users'] = parseInt(a.match(/\d+/g)[3])+10;
+			$array['bots'] = a.match(/\d+/g)[4];
+			if($array.bots != 1)
+			{
+				$(this).replaceWith($array.total_users +' utilizatori ('+ $array.logged_users +' inregistrati, '+ $array.guest_users +' vizitatori, '+ $array.invisible_users +' invizibili [<a href="/viewonline">Lista Completa</a>])<br />');
+				
+			} else {
+				$(this).replaceWith(parseInt($array.total_users)+parseInt($array.bots) +' utilizatori ('+ $array.logged_users +' inregistrati, '+ $array.guest_users +' vizitatori, '+ $array.invisible_users +' invizibili, '+ $array.bots +' boti [<a href="/viewonline">Lista Completa</a>])<br />');
+			}
+		});
+
+		$('p.replace_mybb2').each(function() {
+			var activex = $('a, span[style]:contains("Google"), span[style]:contains("bing"), span[style]:contains("Yahoo!")', this);
+			$('span[style]:contains("Google")', this).html('Google');
+			$('span[style]:contains("bing")', this).html('Bing');
+			$('span[style]:contains("Yahoo!")', this).html('Bing');
+			$(this).replaceWith(activex);
+		});
+
+		$('a[href="#user_link"]').attr('href','/u'+_userdata.user_id);
+
+		$('h2.cForumTitle').each(function() {
+			this.innerHTML=this.innerHTML.replace(/\<h2\>/gi, "");
+		});
+
+		var $menuPopup = '<span class="sageata2"></span><div id="menu_pop" style="display: none; z-index: 999;"><ul id="more_links"><li><a href="/h1-staff-list">Staff List</a></li><li><a href="/search?search_id=newposts">Mesaje noi</a></li><li><a href="#">Text</a></li><li><a href="/search?search_id=unanswered">Mesaje la care nu s-a raspuns</a></li></ul></div>';
+		
+		$('navbar#primarynav ol li > a[href="#more"]').click(function(e) {
+			e.preventDefault();
+			var oThis2 = {
+				topx: $(this).offset(),
+				leftx: $(this).offset()
+			};
+			
+			if(!d.getElementById('menu_pop'))
+			{
+				$('body#bodystrip').append($menuPopup);
+			}
+			
+			if(d.getElementById("menu_pop").style.display == "none" && d.getElementById('menu_pop'))
+			{
+				$('#menu_pop, .sageata2').attr('style','z-index: 999; top: '+ (oThis2.topx.top + $(this).outerHeight() + 10) +'px; left: '+ (oThis2.leftx.left + 25) +'px;');
+			} else {
+				$('#menu_pop, .sageata2').hide().remove();
+			}
+		});
+
+		var link = $('a[href*="/login?logout=1&"]').attr("href");
+		if(link) var TID = link.split('&tid')[1].split('&key')[0];
+		var $userPopUp = '<span class="sageata"></span><div id="user_popup" style="display: none; z-index: 999;">'+
+			'<ol class="usefull_links">'+
+				'<li><a href="/profile?mode=editprofile">Editare Profil</a></li>'+
+				'<li><a href="/privmsg?folder=inbox">Mesaje Private</a></li>'+
+				'<li><a href="/profile?mode=editprofile&page_profil=notifications">Notificari</a></li>'+
+				'<li><a href="/admin/index.forum?part=admin&tid'+ TID +'">Admin CP</a></li>'+
+				'<li><a href="'+ link +'">Deconectare</a></li>'+
+			'</ol>'+
+		'</div>';
+		
+		$('navbar#primarynav ol li > a[href*="/u"]').click(function(e) {
+			e.preventDefault();
+			var oThis = {
+				topx: $(this).offset(),
+				leftx: $(this).offset()
+			};
+
+			if(!d.getElementById('user_popup'))
+			{
+				$('body#bodystrip').append($userPopUp);
+			}
+			
+			if(d.getElementById('user_popup').style.display == "none" && d.getElementById('user_popup'))
+			{
+				$('#user_popup, .sageata').attr('style','z-index: 999; top: '+ (oThis.topx.top + $(this).outerHeight() + 10) +'px; left: '+ (oThis.leftx.left + 25) +'px;');
+			} else {
+				$('#user_popup, .sageata').hide().remove();
+			}
+		});
+		if(_userdata.user_level == 1) $('#user_popup li:contains("Admin CP")').remove();
+	});
+
+	var $iconSystem = function() {
+		function debug(str) {
+			if (window.console && window.console.log) {
+				window.console.log(str);
+			}
+		};
+		
+		var settings = {
+			activate: true,
+			defaultImg: 'https://illiweb.com/fa/prosilver/forum_read.gif'
+		};
+		
+		init = function() {
+			if(settings.activate != false) // Daca e false nu va fi activ.
+			{
+				var t = $('.cForumRow');
+				$('ol.forumDataList li', t).each(function() {
+					var img = $('.desc img:eq(0)', this).attr('src');
+					if(img)
+					{
+						$('dl.icon', this).attr('style', 'background:url('+ img +') no-repeat scroll 10px 50%;');
+					} else {
+						$('dl.icon', this).attr('style', 'background:url('+ settings.defaultImg +') no-repeat scroll 10px 50%;');
+					}
+				});
+			} else debug("[Icon System] Sistemul nu a fost activat de un Admin !");
+		};
+		init();
+	};
+
+	var $protectForum = function() {
+		var Debug = {
+			error: function() {
+				if(window.console && window.console.log) {
+					window.console.log("[Protect Plugin] Sistemul de protectie nu este activat !");
+				}
+			}
+		};
+		
+		var settings = {
+			active: false,
+			categoryID: 1, // With ID
+			categoryName: 'Prima categorie', // With Name
+			categoryNameX: true,
+			categoryIDx: false,
+			logged: true ? false : null,
+		};
+		
+		init = function() {
+			if(settings.active != false) // Verifica daca e conectat si sistemu e activat ! 
+			{
+				if(settings.categoryNameX == true)
+				{
+					$('.cForumRow').each(function() {
+						var getStyle = {
+							widthL: $(this).width(),
+							heightL: $(this).height()
+						};
+						$('h2.cForumTitle:contains("'+ settings.categoryName +'")', this).parent().addClass(' _protect');
+						$('head').append('<style>.cForumRow._protect {position: relative;} ._protect::after {background: none repeat scroll 0px 0px rgba(255, 255, 255, 0.7);bottom: 0px;content: "Members Only";font-size: 30px;left: 0px;line-height: '+ getStyle.heightL +'px;position: absolute;right: 0px;text-align: center;z-index: 10;width: '+ getStyle.widthL +'px; height: '+ getStyle.heightL +'px</style>');
+					});
+				}
+
+				if(settings.categoryIDx == true)
+				{
+					$('.cForumRow:eq('+ categoryID +')').each(function() {
+						var getStyle = {
+							widthL: $(this).width(),
+							heightL: $(this).height()
+						};
+						
+						$(this).addClass(' _protect');
+						$('head').append('<style>.cForumRow._protect {position: relative;} ._protect::after {background: none repeat scroll 0px 0px rgba(255, 255, 255, 0.7);bottom: 0px;content: "Members Only";font-size: 30px;left: 0px;line-height: '+ getStyle.heightL +'px;position: absolute;right: 0px;text-align: center;z-index: 10;width: '+ getStyle.widthL +'px; height: '+ getStyle.heightL +'px</style>');
+					});
+				}
+			} else Debug.error();
+		};
+		init();
+	};
+
+	// Petronel Plugins System
+	j(function() {if(typeof(_userdata) != "undefined") if(_userdata.session_logged_in != 1) $protectForum()});
+	j(function() {$iconSystem()});
+
+	$('document').ready(function() {
+		$('#widget').css({'height': $('div#ipsLayout_mainArea').innerHeight()-30});
+	});
+}(window.jQuery, jQuery, document, 'script'));
