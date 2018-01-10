@@ -1,0 +1,7 @@
+//<![CDATA[
+          function vars(c,d){for(var e=new RegExp(c,"g"),b=$("html"),a=0;a<b.length;a++)b[a].innerHTML=b[a].innerHTML.replace(e,d);return!1};
+          vars('{.USERNAME}', _userdata.username);
+          vars('{.AVATAR}', $(_userdata.avatar).attr('src'));
+          vars('{.USER}', _userdata.username);
+          vars('{.USER_URL}', '/u'+_userdata.user_id);
+	//]]>
